@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Menu — Dapur Mamita{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <!-- Header -->
+        <div class="menu-header mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h1 class="section-title mb-1">
+                        <i class="bi bi-book me-2"></i>Menu Kami
+                    </h1>
+                    {% if nomor_meja %}
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-geo-alt-fill text-accent me-1"></i>
+                            Anda di <strong>Meja {{ nomor_meja }}</strong> — Pilih menu favorit Anda!
+                        </p>
+                    {% else %}
+                        <p class="text-muted mb-0">Pilih hidangan favorit dan pesan langsung ke WhatsApp kami!</p>
+                    {% endif %}
+                </div>
+                <a href="{{ url_for('order.keranjang') }}" class="btn btn-warm position-relative">
+                    <i class="bi bi-cart3 me-1"></i> Keranjang
+                    {% if jumlah_keranjang > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ jumlah_keranjang }}
+                        </span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+
+        <!-- Category Filter -->
+        {% if kategori_list %}
+        <div class="category-filter mb-4">
+            <a href="{{ url_for('main.menu_list') }}"
+               class="filter-chip {% if not kategori_aktif %}active{% endif %}">
+                <i class="bi bi-grid-3x3-gap me-1"></i>Semua
+            </a>
+            {% for kat in kategori_list %}
+            <a href="{{ url_for('main.menu_list', kategori=kat) }}"
+               class="filter-chip {% if kategori_aktif == kat %}active{% endif %}">
+                {% if kat == 'Makanan' %}<i class="bi bi-egg-fried me-1"></i>
+                {% elif kat == 'Minuman' %}<i class="bi bi-cup-hot me-1"></i>
+                {% elif kat == 'Snack' %}<i class="bi bi-cookie me-1"></i>
+                {% elif kat == 'Dessert' %}<i class="bi bi-cake2 me-1"></i>
+                {% elif kat == 'Paket' %}<i class="bi bi-box me-1"></i>
+                {% endif %}
+                {{ kat }}
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Menu Grid -->
+        {% if menu_items %}
+        <div class="row g-4" id="menuGrid">
+            {% for menu in menu_items %}
+            <div class="col-lg-4 col-md-6">
+                <div class="menu-card" data-kategori="{{ menu.kategori }}">
+                    <div class="menu-card-img">
+                        {% if menu.foto_url %}
+                            <img src="{{ menu.foto_url }}" alt="{{ menu.nama }}" loading="lazy">
+                        {% else %}
+                            <div class="menu-placeholder">
+                                {% if menu.kategori == 'Minuman' %}
+                                    <i class="bi bi-cup-hot"></i>
+                                {% elif menu.kategori == 'Snack' %}
+                                    <i class="bi bi-cookie"></i>
+                                {% elif menu.kategori == 'Dessert' %}
+                                    <i class="bi bi-cake2"></i>
+                                {% else %}
+                                    <i class="bi bi-egg-fried"></i>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        <span class="menu-category-badge">{{ menu.kategori }}</span>
+                    </div>
+                    <div class="menu-card-body">
+                        <h5 class="menu-name">{{ menu.nama }}</h5>
+                        {% if menu.deskripsi %}
+                            <p class="menu-desc">{{ menu.deskripsi[:100] }}{% if menu.deskripsi|length > 100 %}...{% endif %}</p>
+                        {% endif %}
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <span class="menu-price">Rp {{ "{:,.0f}".format(menu.harga).replace(",", ".") }}</span>
+                            <form method="POST" action="{{ url_for('order.tambah_keranjang') }}" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="menu_id" value="{{ menu.id }}">
+                                <input type="hidden" name="jumlah" value="1">
+                                <button type="submit" class="btn btn-warm btn-sm">
+                                    <i class="bi bi-plus-lg me-1"></i>Tambah
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-journal-x"></i>
+            <h4>Belum Ada Menu</h4>
+            <p class="text-muted">Menu belum tersedia saat ini. Silakan cek kembali nanti.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

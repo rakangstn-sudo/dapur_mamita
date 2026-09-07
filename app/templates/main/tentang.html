@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Tentang Kami — Dapur Mamita{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <span class="badge-warm mb-3">
+                        <i class="bi bi-heart-fill me-1"></i> Tentang Kami
+                    </span>
+                    <h1 class="section-title">
+                        {% if profil and profil.nama_umkm %}
+                            {{ profil.nama_umkm }}
+                        {% else %}
+                            Dapur Mamita
+                        {% endif %}
+                    </h1>
+                </div>
+
+                {% if profil and profil.foto_url %}
+                <div class="text-center mb-5">
+                    <img src="{{ profil.foto_url }}" alt="{{ profil.nama_umkm }}"
+                         class="rounded-4 shadow-lg" style="max-width: 100%; max-height: 400px; object-fit: cover;">
+                </div>
+                {% endif %}
+
+                <div class="about-card">
+                    {% if profil and profil.deskripsi %}
+                        <div class="about-section">
+                            <h4><i class="bi bi-chat-heart me-2 text-accent"></i>Cerita Kami</h4>
+                            <p class="lead">{{ profil.deskripsi }}</p>
+                        </div>
+                    {% else %}
+                        <div class="about-section">
+                            <h4><i class="bi bi-chat-heart me-2 text-accent"></i>Cerita Kami</h4>
+                            <p class="lead">Dapur Mamita hadir untuk menyajikan masakan rumahan yang penuh cinta. Setiap hidangan kami dibuat dari bahan-bahan segar pilihan dengan resep otentik yang diwariskan turun-temurun.</p>
+                        </div>
+                    {% endif %}
+
+                    <hr class="my-4">
+
+                    <div class="row g-4">
+                        {% if profil and profil.alamat %}
+                        <div class="col-md-6">
+                            <div class="contact-item">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                <div>
+                                    <h6 class="mb-1 fw-semibold">Alamat</h6>
+                                    <p class="mb-0 text-muted">{{ profil.alamat }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if profil and profil.jam_operasional %}
+                        <div class="col-md-6">
+                            <div class="contact-item">
+                                <i class="bi bi-clock-fill"></i>
+                                <div>
+                                    <h6 class="mb-1 fw-semibold">Jam Operasional</h6>
+                                    <p class="mb-0 text-muted">{{ profil.jam_operasional }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if profil and profil.no_wa %}
+                        <div class="col-md-6">
+                            <div class="contact-item">
+                                <i class="bi bi-whatsapp"></i>
+                                <div>
+                                    <h6 class="mb-1 fw-semibold">WhatsApp</h6>
+                                    <p class="mb-0">
+                                        <a href="https://wa.me/{{ profil.no_wa }}" target="_blank" class="text-accent text-decoration-none">
+                                            {{ profil.no_wa }}
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <div class="text-center mt-5">
+                    <div class="cta-box p-5">
+                        <i class="bi bi-qr-code-scan display-4 mb-3 text-accent"></i>
+                        <h4 class="fw-bold">Siap Memesan?</h4>
+                        <p class="text-muted mb-4">Scan QR code di meja Anda untuk langsung melihat menu dan pesan!</p>
+                        <a href="{{ url_for('main.menu_list') }}" class="btn btn-warm btn-lg px-5">
+                            <i class="bi bi-book me-2"></i>Lihat Menu
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

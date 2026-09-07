@@ -1,0 +1,742 @@
+/* ==========================================================================
+   DAPUR MAMITA — STYLESHEET
+   Tema Warna: Hangat (Coklat, Krem, Oranye)
+   ========================================================================== */
+
+:root {
+    --primary-brown: #5D4037;
+    --dark-brown: #3E2723;
+    --light-brown: #8D6E63;
+    --cream-bg: #FAF7F2;
+    --cream-light: #FFF8E7;
+    --accent-orange: #E65100;
+    --accent-orange-hover: #BF360C;
+    --accent-gold: #FFB300;
+    --text-dark: #2C2523;
+    --text-muted: #756D69;
+    --surface-white: #FFFFFF;
+    --border-color: #EFEBE9;
+    --card-shadow: 0 8px 24px rgba(93, 64, 55, 0.08);
+    --card-shadow-hover: 0 14px 30px rgba(93, 64, 55, 0.14);
+}
+
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--cream-bg);
+    color: var(--text-dark);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+h1, h2, h3, .section-title {
+    font-weight: 700;
+    color: var(--dark-brown);
+}
+
+.text-accent {
+    color: var(--accent-orange) !important;
+}
+
+.bg-cream {
+    background-color: var(--cream-light);
+}
+
+/* ==========================================================================
+   NAVBAR & HEADER
+   ========================================================================== */
+#mainNavbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 15px rgba(93, 64, 55, 0.06);
+    padding: 0.75rem 0;
+    transition: all 0.3s ease;
+}
+
+.brand-icon {
+    font-size: 1.6rem;
+    color: var(--accent-orange);
+    animation: flamePulse 2s infinite ease-in-out;
+}
+
+@keyframes flamePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.brand-text {
+    font-weight: 800;
+    font-size: 1.4rem;
+    background: linear-gradient(135deg, var(--dark-brown), var(--accent-orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+}
+
+.navbar .nav-link {
+    font-weight: 500;
+    color: var(--dark-brown);
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.navbar .nav-link:hover {
+    color: var(--accent-orange);
+    background-color: var(--cream-light);
+}
+
+.badge-cart {
+    background-color: var(--accent-orange);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 12px;
+    margin-left: 4px;
+    display: inline-block;
+}
+
+.meja-badge {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1040;
+    background: linear-gradient(135deg, var(--primary-brown), var(--accent-orange));
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 30px;
+    box-shadow: 0 6px 20px rgba(230, 81, 0, 0.35);
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.6); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* ==========================================================================
+   BUTTONS & BADGES
+   ========================================================================== */
+.btn-warm {
+    background: linear-gradient(135deg, var(--accent-orange), #FF8F00);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px rgba(230, 81, 0, 0.25);
+}
+
+.btn-warm:hover, .btn-warm:focus {
+    background: linear-gradient(135deg, var(--accent-orange-hover), var(--accent-orange));
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(230, 81, 0, 0.35);
+}
+
+.btn-outline-warm {
+    color: var(--accent-orange);
+    border: 2px solid var(--accent-orange);
+    background: transparent;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-warm:hover {
+    background-color: var(--accent-orange);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.bg-warm-gradient {
+    background: linear-gradient(135deg, var(--dark-brown) 0%, var(--primary-brown) 60%, var(--accent-orange) 100%);
+}
+
+.badge-warm {
+    display: inline-block;
+    background-color: #FFE0B2;
+    color: var(--accent-orange);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+}
+
+/* ==========================================================================
+   HERO SECTION
+   ========================================================================== */
+.hero-section {
+    position: relative;
+    padding: 80px 0;
+    background: linear-gradient(180deg, #FFFFFF 0%, var(--cream-bg) 100%);
+    overflow: hidden;
+}
+
+.hero-title {
+    font-size: 3rem;
+    line-height: 1.2;
+    margin-bottom: 1.2rem;
+}
+
+.hero-subtitle {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    max-width: 540px;
+}
+
+.hero-image-wrapper {
+    text-align: center;
+}
+
+.hero-image {
+    max-width: 100%;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(93, 64, 55, 0.15);
+}
+
+.hero-placeholder {
+    width: 320px;
+    height: 320px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFE0B2, #FFCC80);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-orange);
+    font-size: 7rem;
+    box-shadow: 0 20px 40px rgba(230, 81, 0, 0.15);
+}
+
+/* ==========================================================================
+   HOW IT WORKS & STEPS
+   ========================================================================== */
+.step-card {
+    background: var(--surface-white);
+    padding: 30px 20px;
+    border-radius: 16px;
+    position: relative;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+
+.step-card:hover {
+    transform: translateY(-6px);
+}
+
+.step-number {
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--accent-orange);
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step-icon {
+    font-size: 2.5rem;
+    color: var(--primary-brown);
+    margin-bottom: 15px;
+}
+
+/* ==========================================================================
+   MENU CARDS & CATEGORY FILTER
+   ========================================================================== */
+.category-filter {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 18px;
+    border-radius: 30px;
+    background-color: var(--surface-white);
+    color: var(--text-dark);
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-decoration: none;
+    white-space: nowrap;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+
+.filter-chip:hover {
+    color: var(--accent-orange);
+    border-color: var(--accent-orange);
+}
+
+.filter-chip.active {
+    background-color: var(--accent-orange);
+    color: #fff;
+    border-color: var(--accent-orange);
+    box-shadow: 0 4px 12px rgba(230, 81, 0, 0.25);
+}
+
+.menu-card {
+    background: var(--surface-white);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.menu-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.menu-card-img {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    background-color: #F5EFEB;
+    overflow: hidden;
+}
+
+.menu-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.menu-card:hover .menu-card-img img {
+    transform: scale(1.05);
+}
+
+.menu-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: var(--light-brown);
+}
+
+.menu-category-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(62, 39, 35, 0.85);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.menu-card-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.menu-name {
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+    color: var(--dark-brown);
+}
+
+.menu-desc {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+    flex-grow: 1;
+}
+
+.menu-price {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--accent-orange);
+}
+
+/* ==========================================================================
+   CART & CHECKOUT
+   ========================================================================== */
+.cart-list {
+    background: var(--surface-white);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 24px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.cart-item-img {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #F5EFEB;
+    flex-shrink: 0;
+}
+
+.cart-item-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cart-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--light-brown);
+    font-size: 1.8rem;
+}
+
+.cart-item-info {
+    flex-grow: 1;
+}
+
+.cart-item-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.qty-control {
+    display: flex;
+    align-items: center;
+    background: var(--cream-bg);
+    border-radius: 20px;
+    padding: 2px 4px;
+    border: 1px solid var(--border-color);
+}
+
+.btn-qty {
+    border: none;
+    background: transparent;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dark-brown);
+    font-weight: bold;
+    padding: 0;
+}
+
+.btn-qty:hover {
+    background: white;
+}
+
+.qty-value {
+    padding: 0 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.checkout-box {
+    background: var(--surface-white);
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: var(--card-shadow);
+}
+
+/* ==========================================================================
+   STATUS PESANAN STEPPER
+   ========================================================================== */
+.status-card {
+    background: var(--surface-white);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 16px;
+}
+
+.status-id {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--dark-brown);
+}
+
+.status-progress {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    padding: 10px 0;
+}
+
+.status-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    z-index: 2;
+}
+
+.status-step.active {
+    color: var(--dark-brown);
+    font-weight: 700;
+}
+
+.status-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #E0E0E0;
+    border: 3px solid #FFF;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.status-step.active .status-dot {
+    background-color: var(--accent-orange);
+    box-shadow: 0 0 0 4px rgba(230, 81, 0, 0.2);
+}
+
+.status-line {
+    flex-grow: 1;
+    height: 4px;
+    background-color: #E0E0E0;
+    margin: 0 -10px;
+    transform: translateY(-10px);
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.status-line.active {
+    background-color: var(--accent-orange);
+}
+
+.order-detail-list {
+    background-color: var(--cream-bg);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.order-detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.order-detail-item:last-child {
+    border-bottom: none;
+}
+
+/* ==========================================================================
+   ADMIN CARDS & LIVE DOT
+   ========================================================================== */
+.stat-card {
+    border-radius: 16px;
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+}
+
+.stat-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.live-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #00E676;
+    box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.3);
+    animation: livePulse 1.6s infinite ease-in-out;
+}
+
+@keyframes livePulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.6; }
+}
+
+.spin-slow {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   AUTH & LOGIN
+   ========================================================================== */
+.login-card {
+    background: var(--surface-white);
+    border-radius: 20px;
+    padding: 40px 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.login-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: #FFE0B2;
+    color: var(--accent-orange);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+/* ==========================================================================
+   ABOUT & FOOTER
+   ========================================================================== */
+.about-card {
+    background: var(--surface-white);
+    border-radius: 20px;
+    padding: 36px;
+    box-shadow: var(--card-shadow);
+}
+
+.contact-item {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.contact-item i {
+    font-size: 1.8rem;
+    color: var(--accent-orange);
+    background: #FFF3E0;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cta-box {
+    background: var(--surface-white);
+    border-radius: 20px;
+    padding: 40px 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: #FFFFFF;
+    font-size: 1.05rem;
+    font-weight: 500;
+}
+
+.info-item i {
+    font-size: 1.4rem;
+    color: #FFB300;
+    flex-shrink: 0;
+}
+
+.info-item span {
+    color: #FFFFFF;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.site-footer {
+    background-color: var(--dark-brown);
+    color: #D7CCC8;
+    padding: 60px 0 30px;
+    margin-top: 60px;
+}
+
+.text-muted-light {
+    color: #BCAAA4;
+}
+
+.footer-links a {
+    color: #D7CCC8;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 8px;
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: var(--accent-orange);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: var(--light-brown);
+    margin-bottom: 15px;
+    display: block;
+}

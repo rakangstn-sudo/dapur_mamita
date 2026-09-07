@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Status Pesanan #{{ pesanan.id }} — Dapur Mamita{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="text-center mb-4">
+                    <h1 class="section-title">
+                        <i class="bi bi-receipt me-2"></i>Status Pesanan
+                    </h1>
+                    {% if nomor_meja %}
+                    <p class="text-muted">
+                        <i class="bi bi-geo-alt-fill me-1"></i>Meja {{ nomor_meja }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <!-- WhatsApp Direct CTA Card -->
+                {% if pesanan.wa_url %}
+                <div class="card border-success border-2 shadow-sm mb-4" style="background: linear-gradient(180deg, #F0FFF4 0%, #FFFFFF 100%);">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-whatsapp display-4 text-success mb-2 d-inline-block animate-pulse"></i>
+                        <h4 class="fw-bold text-dark mb-1">Kirim Rincian Pesanan</h4>
+                        <p class="small text-muted mb-3">
+                            Pesanan atas nama <strong>{{ pesanan.nama_pemesan }}</strong> ({{ pesanan.meja_info or 'Dine-in' }}).<br>
+                            Klik tombol di bawah untuk membuka WhatsApp & mengirim rincian ke kasir/dapur!
+                        </p>
+                        <a href="{{ pesanan.wa_url }}" target="_blank" class="btn btn-success btn-lg px-4 py-3 fw-bold shadow d-inline-flex align-items-center gap-2 w-100 justify-content-center" id="waDirectBtn" style="background-color: #25D366; border-color: #25D366;">
+                            <i class="bi bi-send-fill fs-5"></i>
+                            <span>Kirim ke WhatsApp Dapur Mamita</span>
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Status Card -->
+                <div class="status-card" id="statusCard">
+                    <div class="status-header">
+                        <div>
+                            <span class="status-id">Pesanan #{{ pesanan.id }}</span>
+                            <div class="small text-muted">{{ pesanan.nama_pemesan }} &bull; {{ pesanan.meja_info or 'Dine-in' }}</div>
+                        </div>
+                        <span class="status-time">
+                            <i class="bi bi-clock me-1"></i>
+                            {{ pesanan.created_at.strftime('%H:%M') if pesanan.created_at else '-' }}
+                        </span>
+                    </div>
+
+                    <!-- Status Progress -->
+                    <div class="status-progress my-4">
+                        <div class="status-step {% if pesanan.status in ['menunggu', 'diproses', 'selesai'] %}active{% endif %}">
+                            <div class="status-dot"></div>
+                            <span>Menunggu</span>
+                        </div>
+                        <div class="status-line {% if pesanan.status in ['diproses', 'selesai'] %}active{% endif %}"></div>
+                        <div class="status-step {% if pesanan.status in ['diproses', 'selesai'] %}active{% endif %}">
+                            <div class="status-dot"></div>
+                            <span>Diproses</span>
+                        </div>
+                        <div class="status-line {% if pesanan.status == 'selesai' %}active{% endif %}"></div>
+                        <div class="status-step {% if pesanan.status == 'selesai' %}active{% endif %}">
+                            <div class="status-dot"></div>
+                            <span>Selesai</span>
+                        </div>
+                    </div>
+
+                    {% if pesanan.status == 'dibatalkan' %}
+                    <div class="alert alert-danger text-center mb-3">
+                        <i class="bi bi-x-circle-fill me-1"></i> Pesanan dibatalkan
+                    </div>
+                    {% endif %}
+
+                    <!-- Current Status Badge -->
+                    <div class="text-center mb-4">
+                        <span class="badge bg-{{ pesanan.status_color }} fs-5 px-4 py-2" id="statusBadge">
+                            {% if pesanan.status == 'menunggu' %}
+                                <i class="bi bi-hourglass-split me-1"></i>
+                            {% elif pesanan.status == 'diproses' %}
+                                <i class="bi bi-fire me-1"></i>
+                            {% elif pesanan.status == 'selesai' %}
+                                <i class="bi bi-check-circle-fill me-1"></i>
+                            {% elif pesanan.status == 'dibatalkan' %}
+                                <i class="bi bi-x-circle-fill me-1"></i>
+                            {% endif %}
+                            <span id="statusLabel">{{ pesanan.status_label }}</span>
+                        </span>
+                    </div>
+
+                    <!-- Order Items -->
+                    <h6 class="fw-semibold mb-3">
+                        <i class="bi bi-list-ul me-1"></i>Detail Pesanan
+                    </h6>
+                    <div class="order-detail-list" id="orderItems">
+                        {% for d in pesanan.detail_items %}
+                        <div class="order-detail-item">
+                            <div>
+                                <span class="fw-semibold">{{ d.menu_item.nama if d.menu_item else 'Menu dihapus' }}</span>
+                                <span class="text-muted"> × {{ d.jumlah }}</span>
+                                {% if d.catatan_item %}
+                                    <br><small class="text-muted"><i class="bi bi-chat-left-text me-1"></i>{{ d.catatan_item }}</small>
+                                {% endif %}
+                            </div>
+                            <span class="fw-semibold">Rp {{ "{:,.0f}".format(d.subtotal).replace(",", ".") }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if pesanan.catatan %}
+                    <div class="mt-3 p-3 bg-light rounded-3">
+                        <small class="text-muted">
+                            <i class="bi bi-sticky-fill me-1"></i>Catatan: {{ pesanan.catatan }}
+                        </small>
+                    </div>
+                    {% endif %}
+
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0">Total</h5>
+                        <h4 class="fw-bold text-accent mb-0" id="totalHarga">
+                            Rp {{ "{:,.0f}".format(pesanan.total_harga).replace(",", ".") }}
+                        </h4>
+                    </div>
+                </div>
+
+                <!-- Polling indicator -->
+                <div class="text-center mt-3">
+                    <small class="text-muted" id="pollingStatus">
+                        <i class="bi bi-arrow-repeat spin-slow me-1"></i>
+                        Status otomatis diperbarui...
+                    </small>
+                </div>
+
+                <!-- Back to menu -->
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('main.menu_list') }}" class="btn btn-outline-warm">
+                        <i class="bi bi-plus-lg me-1"></i>Pesan Lagi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const PESANAN_ID = {{ pesanan.id }};
+    const POLL_URL = "{{ url_for('api.status_pesanan', pesanan_id=pesanan.id) }}";
+
+    // Buka WhatsApp secara otomatis saat pertama kali checkout
+    {% if pesanan.wa_url %}
+    document.addEventListener('DOMContentLoaded', function() {
+        const openedKey = 'wa_opened_' + PESANAN_ID;
+        if (!sessionStorage.getItem(openedKey)) {
+            sessionStorage.setItem(openedKey, '1');
+            setTimeout(function() {
+                window.open("{{ pesanan.wa_url|safe }}", "_blank");
+            }, 600);
+        }
+    });
+    {% endif %}
+</script>
+<script src="{{ url_for('static', filename='js/polling.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Pesanan Masuk — Dapur Mamita{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h1 class="section-title mb-1">
+                    <i class="bi bi-receipt me-2"></i>Pesanan Masuk (Real-time)
+                </h1>
+                <p class="text-muted mb-0">
+                    <span class="live-dot me-1"></span>
+                    Auto-refresh aktif tiap 6 detik &bull; Dapur & Kasir
+                </p>
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+                <button type="button" class="btn btn-outline-warm" id="manualRefreshBtn">
+                    <i class="bi bi-arrow-repeat me-1" id="refreshIcon"></i>Refresh Sekarang
+                </button>
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Section Pesanan Aktif (Menunggu & Diproses) -->
+        <div class="card shadow-sm border-0 mb-5">
+            <div class="card-header bg-warm-gradient text-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-fire me-2"></i>Pesanan Aktif Perlu Dikerjakan
+                </h5>
+                <span class="badge bg-white text-dark fs-6" id="badgeTotalAktif">{{ pesanan_aktif|length }} Pesanan</span>
+            </div>
+            <div class="card-body p-0">
+                <div id="pesananAktifContainer">
+                    {% if pesanan_aktif %}
+                    <div class="row g-3 p-3" id="pesananAktifGrid">
+                        {% for p in pesanan_aktif %}
+                        <div class="col-lg-6 pesanan-card-item" id="order-card-{{ p.id }}">
+                            <div class="card border rounded-3 h-100 shadow-sm {% if p.status == 'menunggu' %}border-warning{% elif p.status == 'diproses' %}border-info{% endif %}">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-warm fs-6">{{ p.meja_info or ('Meja ' ~ p.meja.nomor_meja if p.meja else 'Pesanan') }}</span>
+                                        <span class="fw-bold">#{{ p.id }}</span>
+                                        <span class="text-dark fw-semibold">&bull; {{ p.nama_pemesan }}</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock me-1"></i>{{ p.created_at.strftime('%H:%M') if p.created_at else '-' }}
+                                        </small>
+                                        <span class="badge bg-{{ p.status_color }}">{{ p.status_label }}</span>
+                                    </div>
+                                </div>
+                                <div class="card-body py-2">
+                                    <!-- Items List -->
+                                    <ul class="list-group list-group-flush mb-2">
+                                        {% for item in p.detail_items %}
+                                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <span class="fw-bold text-dark">{{ item.jumlah }}x</span>
+                                                <span class="ms-1">{{ item.menu_item.nama if item.menu_item else 'Item Dihapus' }}</span>
+                                                {% if item.catatan_item %}
+                                                    <div class="text-danger small mt-1">
+                                                        <i class="bi bi-info-circle-fill me-1"></i>Catatan: "{{ item.catatan_item }}"
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <span class="fw-semibold text-muted small">
+                                                Rp {{ "{:,.0f}".format(item.subtotal).replace(",", ".") }}
+                                            </span>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+
+                                    {% if p.catatan %}
+                                    <div class="p-2 mb-2 bg-warning-subtle text-dark rounded small">
+                                        <strong><i class="bi bi-sticky me-1"></i>Catatan Meja:</strong> {{ p.catatan }}
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                        <span class="text-muted small">Total Tagihan:</span>
+                                        <span class="fw-bold fs-5 text-accent">
+                                            Rp {{ "{:,.0f}".format(p.total_harga).replace(",", ".") }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-top py-2">
+                                    <form method="POST" action="{{ url_for('admin.ubah_status_pesanan', pesanan_id=p.id) }}" class="d-flex gap-2">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        {% if p.status == 'menunggu' %}
+                                            <button type="submit" name="status" value="diproses" class="btn btn-sm btn-info flex-fill text-white">
+                                                <i class="bi bi-play-circle me-1"></i>Mulai Masak (Proses)
+                                            </button>
+                                        {% elif p.status == 'diproses' %}
+                                            <button type="submit" name="status" value="selesai" class="btn btn-sm btn-success flex-fill">
+                                                <i class="bi bi-check-circle me-1"></i>Pesanan Siap / Selesai
+                                            </button>
+                                        {% endif %}
+
+                                        <button type="submit" name="status" value="dibatalkan" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Yakin ingin membatalkan pesanan #{{ p.id }}?');">
+                                            <i class="bi bi-x-circle"></i> Batal
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5 empty-active-msg">
+                        <i class="bi bi-check2-circle display-4 text-success mb-2"></i>
+                        <h5>Semua pesanan sudah selesai!</h5>
+                        <p class="text-muted mb-0">Belum ada pesanan aktif yang menunggu saat ini.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Pesanan Selesai Hari Ini -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-clock-history me-2 text-muted"></i>Riwayat Selesai & Dibatalkan Hari Ini ({{ pesanan_selesai|length }})
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if pesanan_selesai %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#ID</th>
+                                <th>Meja</th>
+                                <th>Waktu</th>
+                                <th>Ringkasan Pesanan</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th class="text-end">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in pesanan_selesai %}
+                            <tr>
+                                <td class="fw-bold">#{{ p.id }}</td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ p.meja_info or ('Meja ' ~ p.meja.nomor_meja if p.meja else '-') }}</span>
+                                    <div class="small fw-semibold text-dark">{{ p.nama_pemesan }}</div>
+                                </td>
+                                <td class="small text-muted">{{ p.created_at.strftime('%H:%M') if p.created_at else '-' }}</td>
+                                <td>
+                                    <small>
+                                        {% for item in p.detail_items %}
+                                            {{ item.jumlah }}x {{ item.menu_item.nama if item.menu_item else 'Item Dihapus' }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </small>
+                                </td>
+                                <td class="fw-semibold">Rp {{ "{:,.0f}".format(p.total_harga).replace(",", ".") }}</td>
+                                <td>
+                                    <span class="badge bg-{{ p.status_color }}">{{ p.status_label }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <form method="POST" action="{{ url_for('admin.ubah_status_pesanan', pesanan_id=p.id) }}" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" name="status" value="diproses" class="btn btn-sm btn-outline-secondary" title="Kembalikan ke status diproses">
+                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    Belum ada riwayat pesanan selesai untuk hari ini.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-polling untuk dashboard admin pesanan
+    const ADMIN_POLL_URL = "{{ url_for('api.admin_pesanan_list') }}";
+    const CSRF_TOKEN = "{{ csrf_token() }}";
+
+    function pollAdminOrders() {
+        const refreshIcon = document.getElementById('refreshIcon');
+        if (refreshIcon) refreshIcon.classList.add('spin-slow');
+
+        fetch(ADMIN_POLL_URL)
+            .then(res => {
+                if (!res.ok) throw new Error('Network response not ok');
+                return res.json();
+            })
+            .then(data => {
+                const badge = document.getElementById('badgeTotalAktif');
+                if (badge) {
+                    const currentTotal = parseInt(badge.textContent) || 0;
+                    if (data.total !== currentTotal) {
+                        // Reload page bila ada perubahan jumlah pesanan aktif
+                        window.location.reload();
+                    }
+                }
+            })
+            .catch(err => console.log('Polling admin error:', err))
+            .finally(() => {
+                if (refreshIcon) refreshIcon.classList.remove('spin-slow');
+            });
+    }
+
+    // Polling tiap 6 detik
+    setInterval(pollAdminOrders, 6000);
+
+    // Tombol manual refresh
+    document.getElementById('manualRefreshBtn')?.addEventListener('click', function() {
+        window.location.reload();
+    });
+</script>
+{% endblock %}

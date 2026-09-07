@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Profil UMKM — Dapur Mamita{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h1 class="section-title mb-1">
+                    <i class="bi bi-shop me-2"></i>Kelola Profil UMKM
+                </h1>
+                <p class="text-muted mb-0">Informasi nama warung, cerita kuliner, kontak WhatsApp, dan jam operasional</p>
+            </div>
+            <div>
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Kembali ke Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-warm-gradient text-white py-3">
+                        <h5 class="card-title mb-0 fw-bold">
+                            <i class="bi bi-pencil-square me-2"></i>Edit Informasi Dapur Mamita
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST" enctype="multipart/form-data" action="{{ url_for('admin.profil') }}">
+                            {{ form.hidden_tag() }}
+
+                            <div class="mb-3">
+                                <label for="nama_umkm" class="form-label fw-semibold">Nama Usaha / UMKM</label>
+                                {{ form.nama_umkm(class="form-control form-control-lg" + (" is-invalid" if form.nama_umkm.errors else ""), placeholder="Dapur Mamita") }}
+                                {% for error in form.nama_umkm.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="deskripsi" class="form-label fw-semibold">Deskripsi / Tagline Usaha</label>
+                                {{ form.deskripsi(class="form-control" + (" is-invalid" if form.deskripsi.errors else ""), rows=3, placeholder="Deskripsi singkat yang tampil di halaman beranda dan tentang kami...") }}
+                                {% for error in form.deskripsi.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label for="no_wa" class="form-label fw-semibold">Nomor WhatsApp Pelayanan</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-whatsapp"></i></span>
+                                        {{ form.no_wa(class="form-control" + (" is-invalid" if form.no_wa.errors else ""), placeholder="Contoh: 6281234567890") }}
+                                    </div>
+                                    <small class="text-muted">Gunakan format internasional (diawali 62)</small>
+                                    {% for error in form.no_wa.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="jam_operasional" class="form-label fw-semibold">Jam Operasional</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-clock"></i></span>
+                                        {{ form.jam_operasional(class="form-control" + (" is-invalid" if form.jam_operasional.errors else ""), placeholder="Contoh: Setiap Hari, 09.00 - 21.00 WIB") }}
+                                    </div>
+                                    {% for error in form.jam_operasional.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="alamat" class="form-label fw-semibold">Alamat Lengkap Lokasi</label>
+                                {{ form.alamat(class="form-control" + (" is-invalid" if form.alamat.errors else ""), rows=2, placeholder="Jl. Contoh No. 123, Kelurahan, Kecamatan, Kota...") }}
+                                {% for error in form.alamat.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="foto" class="form-label fw-semibold">Foto Banner / Logo Usaha</label>
+                                {{ form.foto(class="form-control" + (" is-invalid" if form.foto.errors else ""), accept="image/png, image/jpeg, image/jpg") }}
+                                <small class="text-muted d-block mt-1">Disimpan ke Supabase Storage. Max 2MB (JPG/PNG)</small>
+                                {% for error in form.foto.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+
+                                {% if profil and profil.foto_url %}
+                                <div class="mt-3 p-2 border rounded bg-light d-inline-block">
+                                    <small class="text-muted d-block mb-1">Foto tersimpan saat ini:</small>
+                                    <img src="{{ profil.foto_url }}" alt="{{ profil.nama_umkm }}" class="rounded" style="max-height: 120px; width: auto;">
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary px-4">Batal</a>
+                                {{ form.submit(class="btn btn-warm btn-lg px-5") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

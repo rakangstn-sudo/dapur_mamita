@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola Meja & QR Code — Dapur Mamita{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h1 class="section-title mb-1">
+                    <i class="bi bi-qr-code me-2"></i>Kelola QR Code Menu
+                </h1>
+                <p class="text-muted mb-0">Cetak QR Code untuk ditempel di meja pelanggan atau kasir</p>
+            </div>
+            <div>
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Kembali ke Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Card QR Code Utama Outlet (1 QR Untuk Semua) -->
+        <div class="card shadow-sm border-0 mb-5 overflow-hidden">
+            <div class="card-header bg-warm-gradient text-white py-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-star-fill text-warning me-2"></i>QR Code Utama Outlet (Cukup 1 QR Untuk Semua Meja)
+                    </h5>
+                    <span class="badge bg-white text-dark px-3 py-2">Rekomendasi untuk Outlet Praktis</span>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="row align-items-center g-4">
+                    <div class="col-md-4 text-center">
+                        <div class="p-3 bg-white rounded-3 border d-inline-block shadow-sm">
+                            <img src="{{ url_for('static', filename=outlet_qr) }}" alt="QR Utama Dapur Mamita" class="img-fluid" style="max-width: 220px;">
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4 class="fw-bold mb-2">1 QR Code Praktis untuk Seluruh Meja</h4>
+                        <p class="text-muted mb-3">
+                            Pelanggan cukup scan QR ini untuk langsung membuka menu digital dari HP mereka, memilih menu, dan mengirim rincian pesanan <strong>langsung ke WhatsApp Anda</strong>. Pelanggan bisa memilih apakah makan di tempat (serta isi nomor meja) atau dibungkus (take away).
+                        </p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{{ url_for('admin.download_outlet_qr') }}" class="btn btn-success btn-lg px-4 shadow-sm">
+                                <i class="bi bi-download me-2"></i>Download PNG untuk Dicetak
+                            </a>
+                            <a href="{{ url_for('main.menu_list') }}" target="_blank" class="btn btn-outline-warm btn-lg px-4">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Buka Menu Digital
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Form Tambah Meja -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 sticky-top" style="top: 85px; z-index: 10;">
+                    <div class="card-header bg-warm-gradient text-white py-3">
+                        <h5 class="card-title mb-0 fw-bold">
+                            <i class="bi bi-plus-circle me-2"></i>Tambah Meja Baru
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST" action="{{ url_for('admin.meja_tambah') }}">
+                            {{ form.hidden_tag() }}
+
+                            <div class="mb-3">
+                                <label for="nomor_meja" class="form-label fw-semibold">Nomor Meja</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                                    {{ form.nomor_meja(class="form-control form-control-lg", placeholder="Contoh: 1, 2, 3...", type="number", min="1") }}
+                                </div>
+                                <small class="text-muted d-block mt-1">Sistem otomatis menghasilkan kode unik dan QR code PNG untuk meja ini.</small>
+                            </div>
+
+                            <button type="submit" class="btn btn-warm btn-lg w-100">
+                                <i class="bi bi-qr-code-scan me-1"></i>Buat Meja & Generate QR
+                            </button>
+                        </form>
+
+                        <hr class="my-4">
+
+                        <div class="p-3 bg-light rounded-3">
+                            <h6 class="fw-bold mb-2"><i class="bi bi-printer me-2 text-accent"></i>Tips Cetak QR</h6>
+                            <p class="small text-muted mb-0">
+                                Unduh gambar QR Code dalam format PNG, lalu cetak (print) untuk ditempel di stand akrilik atau meja fisik. Pelanggan cukup scan dengan kamera HP tanpa perlu install aplikasi apa pun!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List Meja & QR Codes Grid -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="bi bi-grid-3x3 me-2 text-accent"></i>Daftar Meja Fisik ({{ meja_list|length }})
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if meja_list %}
+                        <div class="row g-4">
+                            {% for meja in meja_list %}
+                            <div class="col-md-6">
+                                <div class="card border rounded-3 p-3 h-100 shadow-sm text-center qr-card">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge bg-warm px-3 py-2 fs-6">Meja {{ meja.nomor_meja }}</span>
+                                        <code class="text-muted small">Kode: {{ meja.kode_unik }}</code>
+                                    </div>
+
+                                    <!-- QR Image -->
+                                    <div class="my-3 py-2 bg-white rounded border d-flex justify-content-center align-items-center">
+                                        {% if meja.qr_image_url %}
+                                            <img src="{{ url_for('static', filename=meja.qr_image_url) }}"
+                                                 alt="QR Meja {{ meja.nomor_meja }}"
+                                                 class="img-fluid" style="max-width: 180px; height: auto;">
+                                        {% else %}
+                                            <div class="text-muted p-4">
+                                                <i class="bi bi-exclamation-triangle fs-1"></i>
+                                                <div class="small">QR belum di-generate</div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Link Preview Test -->
+                                    <div class="mb-3">
+                                        <a href="{{ url_for('main.menu_list', meja=meja.kode_unik) }}"
+                                           target="_blank" class="btn btn-sm btn-outline-secondary w-100" title="Buka menu seolah scan QR ini">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i>Simulasi Scan (Buka Menu)
+                                        </a>
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="d-flex gap-2 justify-content-center mt-auto">
+                                        {% if meja.qr_image_url %}
+                                        <a href="{{ url_for('admin.download_qr', meja_id=meja.id) }}"
+                                           class="btn btn-sm btn-success flex-fill">
+                                            <i class="bi bi-download me-1"></i>Download PNG
+                                        </a>
+                                        {% endif %}
+
+                                        <form method="POST" action="{{ url_for('admin.regenerate_qr', meja_id=meja.id) }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Regenerate QR Code">
+                                                <i class="bi bi-arrow-repeat"></i>
+                                            </button>
+                                        </form>
+
+                                        <form method="POST" action="{{ url_for('admin.meja_hapus', meja_id=meja.id) }}"
+                                              onsubmit="return confirm('Hapus Meja {{ meja.nomor_meja }}? Pesanan riwayat meja ini tetap aman.');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Meja">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state py-5 text-center">
+                            <i class="bi bi-qr-code fs-1 text-muted"></i>
+                            <h5 class="mt-3">Belum ada meja yang terdaftar</h5>
+                            <p class="text-muted">Tambahkan nomor meja pertama Anda pada formulir di sebelah kiri.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

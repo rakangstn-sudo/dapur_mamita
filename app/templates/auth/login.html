@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Login Admin — Dapur Mamita{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="login-card">
+                    <div class="text-center mb-4">
+                        <div class="login-icon">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+                        <h2 class="fw-bold mt-3">Login Admin</h2>
+                        <p class="text-muted">Masuk ke panel admin Dapur Mamita</p>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-semibold">
+                                <i class="bi bi-person me-1"></i>Username
+                            </label>
+                            {{ form.username(class="form-control form-control-lg", id="username",
+                               placeholder="Masukkan username") }}
+                            {% if form.username.errors %}
+                                {% for error in form.username.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-semibold">
+                                <i class="bi bi-lock me-1"></i>Password
+                            </label>
+                            <div class="position-relative">
+                                {{ form.password(class="form-control form-control-lg", id="password",
+                                   placeholder="Masukkan password") }}
+                                <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-muted"
+                                        onclick="togglePassword()" id="togglePwdBtn">
+                                    <i class="bi bi-eye" id="togglePwdIcon"></i>
+                                </button>
+                            </div>
+                            {% if form.password.errors %}
+                                {% for error in form.password.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-warm btn-lg w-100">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('main.index') }}" class="text-muted text-decoration-none">
+                            <i class="bi bi-arrow-left me-1"></i>Kembali ke Beranda
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePassword() {
+        const pwd = document.getElementById('password');
+        const icon = document.getElementById('togglePwdIcon');
+        if (pwd.type === 'password') {
+            pwd.type = 'text';
+            icon.className = 'bi bi-eye-slash';
+        } else {
+            pwd.type = 'password';
+            icon.className = 'bi bi-eye';
+        }
+    }
+</script>
+{% endblock %}

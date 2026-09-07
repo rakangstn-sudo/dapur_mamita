@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Admin — Dapur Mamita{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div>
+                <h1 class="section-title mb-1">
+                    <i class="bi bi-speedometer2 me-2"></i>Dashboard Admin
+                </h1>
+                <p class="text-muted mb-0">Ringkasan aktivitas dan operasional Dapur Mamita hari ini</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('admin.pesanan_masuk') }}" class="btn btn-warm position-relative">
+                    <i class="bi bi-receipt me-1"></i>Pesanan Masuk
+                    {% if pesanan_menunggu > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ pesanan_menunggu }}
+                    </span>
+                    {% endif %}
+                </a>
+                <a href="{{ url_for('admin.menu_tambah') }}" class="btn btn-outline-warm">
+                    <i class="bi bi-plus-circle me-1"></i>Tambah Menu
+                </a>
+            </div>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="row g-3 mb-4">
+            <!-- Pesanan Hari Ini -->
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="text-muted small text-uppercase fw-bold">Pesanan Hari Ini</span>
+                                <h2 class="fw-bold my-2">{{ pesanan_hari_ini }}</h2>
+                                <span class="badge bg-light text-dark border">
+                                    <i class="bi bi-calendar-event me-1"></i>Hari ini
+                                </span>
+                            </div>
+                            <div class="stat-icon bg-primary-subtle text-primary">
+                                <i class="bi bi-bag-check fs-3"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pesanan Menunggu -->
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="text-muted small text-uppercase fw-bold">Menunggu Proses</span>
+                                <h2 class="fw-bold my-2 text-warning">{{ pesanan_menunggu }}</h2>
+                                <span class="badge bg-warning-subtle text-warning">Perlu tindakan</span>
+                            </div>
+                            <div class="stat-icon bg-warning-subtle text-warning">
+                                <i class="bi bi-hourglass-split fs-3"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pesanan Diproses -->
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="text-muted small text-uppercase fw-bold">Sedang Dimasak</span>
+                                <h2 class="fw-bold my-2 text-info">{{ pesanan_diproses }}</h2>
+                                <span class="badge bg-info-subtle text-info">Di dapur</span>
+                            </div>
+                            <div class="stat-icon bg-info-subtle text-info">
+                                <i class="bi bi-fire fs-3"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pendapatan Hari Ini -->
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="text-muted small text-uppercase fw-bold">Pendapatan Hari Ini</span>
+                                <h3 class="fw-bold my-2 text-success">Rp {{ "{:,.0f}".format(pendapatan or 0).replace(",", ".") }}</h3>
+                                <span class="badge bg-success-subtle text-success">Pesanan Selesai</span>
+                            </div>
+                            <div class="stat-icon bg-success-subtle text-success">
+                                <i class="bi bi-cash-stack fs-3"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Access & Master Data Stats -->
+        <div class="row g-4">
+            <!-- Info Data Master -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-grid-fill text-accent me-2"></i>Status Data Master</h5>
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="p-3 bg-light rounded-3 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1 text-muted">Total Menu</h6>
+                                        <h4 class="mb-0 fw-bold">{{ total_menu }} <small class="text-muted fs-6">({{ menu_aktif }} aktif)</small></h4>
+                                    </div>
+                                    <a href="{{ url_for('admin.menu_list') }}" class="btn btn-sm btn-outline-warm">Kelola</a>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="p-3 bg-light rounded-3 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1 text-muted">Total Meja & QR</h6>
+                                        <h4 class="mb-0 fw-bold">{{ total_meja }} <small class="text-muted fs-6">Meja</small></h4>
+                                    </div>
+                                    <a href="{{ url_for('admin.meja_list') }}" class="btn btn-sm btn-outline-warm">Kelola</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Petunjuk Alur -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-info-circle-fill text-accent me-2"></i>Panduan Cepat Operasional</h5>
+                        <ol class="mb-0 ps-3 text-muted">
+                            <li class="mb-2">Pastikan semua meja sudah dicetak QR code-nya melalui menu <strong>Kelola Meja</strong>.</li>
+                            <li class="mb-2">Saat ada pesanan baru, notifikasi status akan muncul di halaman <strong>Pesanan Masuk</strong>.</li>
+                            <li class="mb-2">Ubah status pesanan dari <em>Menunggu</em> &rarr; <em>Diproses</em> saat mulai dimasak.</li>
+                            <li>Ubah menjadi <em>Selesai</em> setelah pesanan diantar ke meja pembeli.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigasi Menu Admin -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-gear-fill text-accent me-2"></i>Navigasi Cepat</h5>
+                        <div class="list-group list-group-flush">
+                            <a href="{{ url_for('admin.pesanan_masuk') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                                <div>
+                                    <i class="bi bi-receipt text-accent me-2"></i>Pesanan Masuk (Realtime)
+                                </div>
+                                <i class="bi bi-chevron-right text-muted small"></i>
+                            </a>
+                            <a href="{{ url_for('admin.menu_list') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                                <div>
+                                    <i class="bi bi-journal-text text-accent me-2"></i>Kelola Menu & Foto
+                                </div>
+                                <i class="bi bi-chevron-right text-muted small"></i>
+                            </a>
+                            <a href="{{ url_for('admin.meja_list') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                                <div>
+                                    <i class="bi bi-qr-code text-accent me-2"></i>Kelola Meja & Download QR
+                                </div>
+                                <i class="bi bi-chevron-right text-muted small"></i>
+                            </a>
+                            <a href="{{ url_for('admin.profil') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                                <div>
+                                    <i class="bi bi-shop text-accent me-2"></i>Pengaturan Profil UMKM
+                                </div>
+                                <i class="bi bi-chevron-right text-muted small"></i>
+                            </a>
+                            <a href="{{ url_for('main.menu_list') }}" target="_blank" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                                <div>
+                                    <i class="bi bi-eye text-accent me-2"></i>Lihat Menu Publik (Customer)
+                                </div>
+                                <i class="bi bi-box-arrow-up-right text-muted small"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

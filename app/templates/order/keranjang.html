@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Keranjang — Dapur Mamita{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="section-title mb-0">
+                        <i class="bi bi-cart3 me-2"></i>Keranjang
+                    </h1>
+                    {% if nomor_meja %}
+                    <span class="badge bg-warm fs-6">
+                        <i class="bi bi-geo-alt-fill me-1"></i>Meja {{ nomor_meja }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                {% if keranjang %}
+                <!-- Cart Items -->
+                <div class="cart-list">
+                    {% for item in keranjang %}
+                    <div class="cart-item">
+                        <div class="cart-item-img">
+                            {% if item.foto_url %}
+                                <img src="{{ item.foto_url }}" alt="{{ item.nama }}">
+                            {% else %}
+                                <div class="cart-img-placeholder">
+                                    <i class="bi bi-egg-fried"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="cart-item-info">
+                            <h6 class="fw-semibold mb-1">{{ item.nama }}</h6>
+                            <p class="text-accent fw-semibold mb-1">
+                                Rp {{ "{:,.0f}".format(item.harga).replace(",", ".") }}
+                            </p>
+                            {% if item.catatan_item %}
+                                <small class="text-muted">
+                                    <i class="bi bi-chat-left-text me-1"></i>{{ item.catatan_item }}
+                                </small>
+                            {% endif %}
+                        </div>
+                        <div class="cart-item-actions">
+                            <div class="qty-control">
+                                <form method="POST" action="{{ url_for('order.update_keranjang') }}" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="index" value="{{ loop.index0 }}">
+                                    <input type="hidden" name="action" value="kurang">
+                                    <button type="submit" class="btn btn-qty">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
+                                </form>
+                                <span class="qty-value">{{ item.jumlah }}</span>
+                                <form method="POST" action="{{ url_for('order.update_keranjang') }}" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="index" value="{{ loop.index0 }}">
+                                    <input type="hidden" name="action" value="tambah">
+                                    <button type="submit" class="btn btn-qty">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            <p class="fw-bold text-end mb-1">
+                                Rp {{ "{:,.0f}".format(item.subtotal).replace(",", ".") }}
+                            </p>
+                            <div class="d-flex gap-1">
+                                <!-- Catatan toggle -->
+                                <button class="btn btn-sm btn-outline-secondary" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#catatan-{{ loop.index0 }}">
+                                    <i class="bi bi-chat-left-text"></i>
+                                </button>
+                                <!-- Hapus -->
+                                <form method="POST" action="{{ url_for('order.update_keranjang') }}" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="index" value="{{ loop.index0 }}">
+                                    <input type="hidden" name="action" value="hapus">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Hapus item ini?')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Catatan Item Collapse -->
+                    <div class="collapse mb-3" id="catatan-{{ loop.index0 }}">
+                        <form method="POST" action="{{ url_for('order.update_keranjang') }}" class="d-flex gap-2 px-3">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="index" value="{{ loop.index0 }}">
+                            <input type="hidden" name="action" value="catatan">
+                            <input type="text" name="catatan_item" class="form-control form-control-sm"
+                                   placeholder="Contoh: pedas level 2, tanpa sayur..."
+                                   value="{{ item.catatan_item or '' }}" maxlength="300">
+                            <button type="submit" class="btn btn-sm btn-warm">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Total & Checkout -->
+                <div class="checkout-box">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0">Total</h5>
+                        <h4 class="fw-bold text-accent mb-0">
+                            Rp {{ "{:,.0f}".format(total).replace(",", ".") }}
+                        </h4>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('order.checkout') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-3">
+                            <label for="nama_pemesan" class="form-label fw-semibold">
+                                <i class="bi bi-person me-1 text-accent"></i>Nama Pemesan <span class="text-danger">*</span>
+                            </label>
+                            {{ form.nama_pemesan(class="form-control form-control-lg", id="nama_pemesan", placeholder="Contoh: Kak Budi", value=session.get('nama_pemesan', '')) }}
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-sm-6">
+                                <label for="tipe_pesanan" class="form-label fw-semibold">
+                                    <i class="bi bi-shop me-1 text-accent"></i>Tipe Pesanan
+                                </label>
+                                {{ form.tipe_pesanan(class="form-select", id="tipe_pesanan") }}
+                            </div>
+                            <div class="col-sm-6" id="mejaWrapper">
+                                <label for="nomor_meja" class="form-label fw-semibold">
+                                    <i class="bi bi-geo-alt me-1 text-accent"></i>Nomor Meja
+                                </label>
+                                {{ form.nomor_meja(class="form-control", id="nomor_meja", placeholder="Contoh: 1, 2, atau Depan Kasir", value=session.get('nomor_meja', '')) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="catatan" class="form-label fw-semibold">
+                                <i class="bi bi-sticky me-1 text-accent"></i>Catatan Tambahan (opsional)
+                            </label>
+                            <textarea name="catatan" id="catatan" class="form-control" rows="2"
+                                      placeholder="Contoh: Jangan terlalu pedas, kuah dipisah, dll..."
+                                      maxlength="500">{{ form.catatan.data or '' }}</textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg w-100 py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" style="background-color: #25D366; border-color: #25D366;">
+                            <i class="bi bi-whatsapp fs-4"></i>
+                            <span>Pesan Sekarang (Langsung ke WhatsApp)</span>
+                        </button>
+                    </form>
+
+                    <a href="{{ url_for('main.menu_list') }}" class="btn btn-outline-warm w-100 mt-2">
+                        <i class="bi bi-plus-lg me-1"></i>Tambah Menu Lain
+                    </a>
+                </div>
+
+                {% else %}
+                <!-- Empty Cart -->
+                <div class="empty-state">
+                    <i class="bi bi-cart-x"></i>
+                    <h4>Keranjang Kosong</h4>
+                    <p class="text-muted">Belum ada item di keranjang Anda. Yuk pilih menu favorit!</p>
+                    <a href="{{ url_for('main.menu_list') }}" class="btn btn-warm btn-lg">
+                        <i class="bi bi-book me-2"></i>Lihat Menu
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

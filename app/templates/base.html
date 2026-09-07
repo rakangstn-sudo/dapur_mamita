@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dapur Mamita — Sajian rumahan khas yang menggugah selera. Pesan langsung dari meja Anda!">
+
+    <title>{% block title %}Dapur Mamita{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top" id="mainNavbar">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('main.index') }}">
+                <i class="bi bi-fire brand-icon"></i>
+                <span class="brand-text">Dapur Mamita</span>
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.index') }}">
+                            <i class="bi bi-house-heart me-1"></i>Beranda
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.menu_list') }}">
+                            <i class="bi bi-book me-1"></i>Menu
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.tentang') }}">
+                            <i class="bi bi-info-circle me-1"></i>Tentang
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="{{ url_for('order.keranjang') }}" id="cartLink">
+                            <i class="bi bi-cart3 me-1"></i>Keranjang
+                            <span class="badge-cart" id="cartBadge">
+                                {% set keranjang = session.get('keranjang', []) %}
+                                {% set jml = namespace(total=0) %}
+                                {% for item in keranjang %}
+                                    {% set jml.total = jml.total + item.get('jumlah', 0) %}
+                                {% endfor %}
+                                {% if jml.total > 0 %}{{ jml.total }}{% endif %}
+                            </span>
+                        </a>
+                    </li>
+
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-gear me-1"></i>Admin
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.menu_list') }}"><i class="bi bi-journal-text me-2"></i>Kelola Menu</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.meja_list') }}"><i class="bi bi-qr-code me-2"></i>Kelola Meja</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.pesanan_masuk') }}"><i class="bi bi-receipt me-2"></i>Pesanan Masuk</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.profil') }}"><i class="bi bi-shop me-2"></i>Profil UMKM</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                        <a class="btn btn-sm btn-outline-warm px-3 d-flex align-items-center" href="{{ url_for('auth.login') }}">
+                            <i class="bi bi-shield-lock me-1"></i>Login Admin
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Meja badge -->
+    {% if session.get('nomor_meja') %}
+    <div class="meja-badge">
+        <i class="bi bi-geo-alt-fill"></i> Meja {{ session.get('nomor_meja') }}
+    </div>
+    {% endif %}
+
+    <!-- Flash messages -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show border-0 shadow-sm" role="alert">
+                    {% if category == 'success' %}
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                    {% elif category == 'danger' %}
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    {% elif category == 'warning' %}
+                        <i class="bi bi-exclamation-circle-fill me-2"></i>
+                    {% elif category == 'info' %}
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                    {% endif %}
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-5">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <i class="bi bi-fire fs-3 text-accent"></i>
+                        <h5 class="mb-0 fw-bold text-white">Dapur Mamita</h5>
+                    </div>
+                    <p class="text-muted-light mb-0">Sajian rumahan khas yang menggugah selera. Dibuat dengan cinta dan bahan-bahan terbaik untuk keluarga Indonesia.</p>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="text-white fw-semibold mb-3">Navigasi</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="{{ url_for('main.index') }}">Beranda</a></li>
+                        <li><a href="{{ url_for('main.menu_list') }}">Menu</a></li>
+                        <li><a href="{{ url_for('main.tentang') }}">Tentang Kami</a></li>
+                        <li><a href="{{ url_for('auth.login') }}"><i class="bi bi-shield-lock me-1"></i>Login Admin</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="text-white fw-semibold mb-3">Kontak</h6>
+                    <ul class="list-unstyled footer-links">
+                        {% set profil_footer = None %}
+                        <li><i class="bi bi-clock me-2"></i>Buka setiap hari</li>
+                        <li><i class="bi bi-whatsapp me-2"></i>Hubungi via WhatsApp</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-secondary my-4">
+            <div class="text-center text-muted-light">
+                <small>&copy; {{ now().year if now is defined else '2026' }} Dapur Mamita. Dibuat dengan <i class="bi bi-heart-fill text-danger"></i></small>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% block extra_js %}{% endblock %}
+
+    <script>
+        // Auto-dismiss flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.alert').forEach(function(alert) {
+                    var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
