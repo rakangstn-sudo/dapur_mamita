@@ -131,7 +131,22 @@ def seed_database():
                 "kategori": "Minuman",
                 "tersedia": True,
                 "foto_url": ""
+            }
+        ]
 
+        for data in contoh_menu:
+            existing = MenuItem.query.filter_by(nama=data['nama']).first()
+            if not existing:
+                item = MenuItem(**data)
+                db.session.add(item)
+                print(f"   [+] Menu ditambahkan: {data['nama']}")
+            else:
+                print(f"   [*] Menu '{data['nama']}' sudah ada.")
+
+        # 4. Seed Meja & Generate QR
+        print("\n>> Mengisi Meja & Generate QR code...")
+        for no in range(1, 6):
+            meja = Meja.query.filter_by(nomor_meja=no).first()
             if not meja:
                 kode_unik = f"MEJA{no}_{uuid.uuid4().hex[:6].upper()}"
                 qr_path = generate_qr_code(kode_unik, app)
