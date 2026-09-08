@@ -9,7 +9,7 @@ import qrcode
 from io import BytesIO
 from flask import (
     render_template, redirect, url_for, flash, request,
-    current_app, send_from_directory
+    current_app, send_file
 )
 from flask_login import login_required
 from . import admin_bp
@@ -209,78 +209,64 @@ def get_base_url(app):
     return app.config.get('BASE_URL', 'http://localhost:5000').rstrip('/')
 
 
-def generate_qr_code(kode_unik, app):
-    """Generate QR code PNG untuk meja dan simpan ke static/qrcodes/."""
-    base_url = get_base_url(app)
-    url = f"{base_url}/menu?meja={kode_unik}"
-
+def create_qr_buffer(url, fill_color='#3E2723', box_size=10):
+    """Generate QR code PNG ke memory buffer (BytesIO) tanpa menulis ke disk."""
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
-        box_size=10,
+        box_size=box_size,
         border=4,
     )
     qr.add_data(url)
     qr.make(fit=True)
-
-    img = qr.make_image(fill_color='#5D4037', back_color='white')
-
-    # Simpan ke static/qrcodes/
-    qr_folder = os.path.join(app.static_folder, 'qrcodes')
-    os.makedirs(qr_folder, exist_ok=True)
-    filepath = os.path.join(qr_folder, f'meja_{kode_unik}.png')
-    img.save(filepath)
-
-    return f'qrcodes/meja_{kode_unik}.png'
+    img = qr.make_image(fill_color=fill_color, back_color='white')
+    buf = BytesIO()
+    img.save(buf, format='PNG')
+    buf.seek(0)
+    return buf
 
 
-def generate_outlet_qr_code(app):
-    """Generate 1 QR code PNG utama untuk seluruh outlet (mengarah ke /menu)."""
-    base_url = get_base_url(app)
+@admin_bp.route('/outlet/qr.png')
+def stream_outlet_qr():
+    """Stream gambar QR code utama outlet langsung dari memori."""
+    base_url = get_base_url(current_app)
     url = f"{base_url}/menu"
-
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_H,
-        box_size=12,
-        border=4,
-    )
-    qr.add_data(url)
-    qr.make(fit=True)
-
-    img = qr.make_image(fill_color='#3E2723', back_color='white')
-
-    qr_folder = os.path.join(app.static_folder, 'qrcodes')
-    os.makedirs(qr_folder, exist_ok=True)
-    filepath = os.path.join(qr_folder, 'qr_outlet_mamita.png')
-    img.save(filepath)
-
-    return 'qrcodes/qr_outlet_mamita.png'
+    buf = create_qr_buffer(url, fill_color='#3E2723', box_size=12)
+    return send_file(buf, mimetype='image/png')
 
 
 @admin_bp.route('/outlet/download-qr')
 @login_required
 def download_outlet_qr():
-    """Download QR Code Utama Outlet Dapur Mamita."""
-    generate_outlet_qr_code(current_app)
-    qr_folder = os.path.join(current_app.static_folder, 'qrcodes')
-    return send_from_directory(
-        qr_folder, 'qr_outlet_mamita.png',
+    """Download QR Code Utama Outlet Dapur Mamita langsung dari memori."""
+    base_url = get_base_url(current_app)
+    url = f"{base_url}/menu"
+    buf = create_qr_buffer(url, fill_color='#3E2723', box_size=14)
+    return send_file(
+        buf,
+        mimetype='image/png',
         as_attachment=True,
         download_name='QR_Menu_Dapur_Mamita.png'
     )
+
+
+@admin_bp.route('/meja/qr/<kode_unik>.png')
+def stream_meja_qr(kode_unik):
+    """Stream gambar QR code meja secara dinamis dari memori."""
+    base_url = get_base_url(current_app)
+    url = f"{base_url}/menu?meja={kode_unik}"
+    buf = create_qr_buffer(url, fill_color='#5D4037', box_size=10)
+    return send_file(buf, mimetype='image/png')
 
 
 @admin_bp.route('/meja')
 @login_required
 def meja_list():
     """Daftar QR code (QR Utama Outlet + Meja opsional)."""
-    outlet_qr = generate_outlet_qr_code(current_app)
     meja_list = Meja.query.order_by(Meja.nomor_meja).all()
     form = MejaForm()
     return render_template(
         'admin/meja_list.html',
-        outlet_qr=outlet_qr,
         meja_list=meja_list,
         form=form
     )
@@ -289,7 +275,7 @@ def meja_list():
 @admin_bp.route('/meja/tambah', methods=['POST'])
 @login_required
 def meja_tambah():
-    """Tambah meja baru + generate QR code."""
+    """Tambah meja baru."""
     form = MejaForm()
 
     if form.validate_on_submit():
@@ -303,12 +289,9 @@ def meja_tambah():
 
         meja = Meja(
             nomor_meja=form.nomor_meja.data,
-            kode_unik=kode_unik
+            kode_unik=kode_unik,
+            qr_image_url=f"meja_{kode_unik}.png"
         )
-
-        # Generate QR code
-        qr_path = generate_qr_code(kode_unik, current_app)
-        meja.qr_image_url = qr_path
 
         db.session.add(meja)
         db.session.commit()
@@ -329,12 +312,6 @@ def meja_hapus(meja_id):
     meja = Meja.query.get_or_404(meja_id)
     nomor = meja.nomor_meja
 
-    # Hapus file QR code jika ada
-    if meja.qr_image_url:
-        qr_path = os.path.join(current_app.static_folder, meja.qr_image_url)
-        if os.path.exists(qr_path):
-            os.remove(qr_path)
-
     db.session.delete(meja)
     db.session.commit()
     flash(f'Meja {nomor} berhasil dihapus.', 'info')
@@ -344,17 +321,15 @@ def meja_hapus(meja_id):
 @admin_bp.route('/meja/download-qr/<int:meja_id>')
 @login_required
 def download_qr(meja_id):
-    """Download QR code meja sebagai PNG."""
+    """Download QR code meja sebagai PNG dari memori."""
     meja = Meja.query.get_or_404(meja_id)
-    if not meja.qr_image_url:
-        flash('QR code belum tersedia.', 'warning')
-        return redirect(url_for('admin.meja_list'))
+    base_url = get_base_url(current_app)
+    url = f"{base_url}/menu?meja={meja.kode_unik}"
+    buf = create_qr_buffer(url, fill_color='#5D4037', box_size=14)
 
-    qr_folder = os.path.join(current_app.static_folder, 'qrcodes')
-    filename = f'meja_{meja.kode_unik}.png'
-
-    return send_from_directory(
-        qr_folder, filename,
+    return send_file(
+        buf,
+        mimetype='image/png',
         as_attachment=True,
         download_name=f'QR_Meja_{meja.nomor_meja}.png'
     )
@@ -365,8 +340,8 @@ def download_qr(meja_id):
 def regenerate_qr(meja_id):
     """Regenerate QR code untuk meja."""
     meja = Meja.query.get_or_404(meja_id)
-    qr_path = generate_qr_code(meja.kode_unik, current_app)
-    meja.qr_image_url = qr_path
+    meja.kode_unik = uuid.uuid4().hex[:8].upper()
+    meja.qr_image_url = f"meja_{meja.kode_unik}.png"
     db.session.commit()
     flash(f'QR code Meja {meja.nomor_meja} berhasil di-regenerate.', 'success')
     return redirect(url_for('admin.meja_list'))

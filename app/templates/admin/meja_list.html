@@ -34,7 +34,7 @@
                 <div class="row align-items-center g-4">
                     <div class="col-md-4 text-center">
                         <div class="p-3 bg-white rounded-3 border d-inline-block shadow-sm">
-                            <img src="{{ url_for('static', filename=outlet_qr) }}" alt="QR Utama Dapur Mamita" class="img-fluid" style="max-width: 220px;">
+                            <img src="{{ url_for('admin.stream_outlet_qr') }}" alt="QR Utama Dapur Mamita" class="img-fluid" style="max-width: 220px;">
                         </div>
                     </div>
                     <div class="col-md-8">
@@ -115,16 +115,9 @@
 
                                     <!-- QR Image -->
                                     <div class="my-3 py-2 bg-white rounded border d-flex justify-content-center align-items-center">
-                                        {% if meja.qr_image_url %}
-                                            <img src="{{ url_for('static', filename=meja.qr_image_url) }}"
-                                                 alt="QR Meja {{ meja.nomor_meja }}"
-                                                 class="img-fluid" style="max-width: 180px; height: auto;">
-                                        {% else %}
-                                            <div class="text-muted p-4">
-                                                <i class="bi bi-exclamation-triangle fs-1"></i>
-                                                <div class="small">QR belum di-generate</div>
-                                            </div>
-                                        {% endif %}
+                                        <img src="{{ url_for('admin.stream_meja_qr', kode_unik=meja.kode_unik) }}"
+                                             alt="QR Meja {{ meja.nomor_meja }}"
+                                             class="img-fluid" style="max-width: 180px; height: auto;">
                                     </div>
 
                                     <!-- Link Preview Test -->
@@ -137,12 +130,10 @@
 
                                     <!-- Action Buttons -->
                                     <div class="d-flex gap-2 justify-content-center mt-auto">
-                                        {% if meja.qr_image_url %}
                                         <a href="{{ url_for('admin.download_qr', meja_id=meja.id) }}"
                                            class="btn btn-sm btn-success flex-fill">
                                             <i class="bi bi-download me-1"></i>Download PNG
                                         </a>
-                                        {% endif %}
 
                                         <form method="POST" action="{{ url_for('admin.regenerate_qr', meja_id=meja.id) }}">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
