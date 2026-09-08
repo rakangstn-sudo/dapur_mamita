@@ -42,7 +42,7 @@ def seed_database():
                 nama_umkm="Dapur Mamita",
                 deskripsi="Sajian rumahan khas yang dimasak dengan cinta, bahan segar harian, dan rempah Nusantara terbaik.",
                 alamat="Jl. Kenangan Kuliner No. 12, Kota Kuliner, Indonesia",
-                no_wa="6281234567890",
+                no_wa="6282118403965",
                 jam_operasional="Setiap Hari: 10.00 - 22.00 WIB"
             )
             db.session.add(profil)

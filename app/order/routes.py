@@ -176,7 +176,7 @@ def checkout():
 
     # Buat format WhatsApp otomatis
     profil = ProfilUMKM.query.first()
-    no_wa = profil.no_wa if profil and profil.no_wa else '6281234567890'
+    no_wa = profil.no_wa if profil and profil.no_wa else '6282118403965'
     no_wa_clean = ''.join(c for c in no_wa if c.isdigit())
     if no_wa_clean.startswith('0'):
         no_wa_clean = '62' + no_wa_clean[1:]
