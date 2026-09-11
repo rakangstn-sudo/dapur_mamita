@@ -5,6 +5,7 @@ Routes halaman publik: landing page, menu digital, tentang.
 from flask import render_template, request, session, abort
 from . import main_bp
 from ..models import MenuItem, Meja, ProfilUMKM
+from ..services import CartService
 
 
 @main_bp.route('/')
@@ -55,9 +56,8 @@ def menu_list():
     )
     kategori_list = [k[0] for k in kategori_list]
 
-    # Hitung jumlah item di keranjang
-    keranjang = session.get('keranjang', [])
-    jumlah_keranjang = sum(item.get('jumlah', 0) for item in keranjang)
+    # Hitung total kuantitas item di keranjang belanja
+    jumlah_keranjang = CartService.get_total_count()
 
     return render_template(
         'main/menu_list.html',

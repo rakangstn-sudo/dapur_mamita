@@ -6,6 +6,7 @@ from flask import jsonify, session
 from flask_login import login_required
 from . import api_bp
 from ..models import Pesanan
+from ..constants import OrderStatus
 from ..extensions import csrf
 
 
@@ -53,7 +54,7 @@ def admin_pesanan_list():
     """
     pesanan_aktif = (
         Pesanan.query
-        .filter(Pesanan.status.in_(['menunggu', 'diproses']))
+        .filter(Pesanan.status.in_(OrderStatus.ACTIVE))
         .order_by(Pesanan.created_at.desc())
         .all()
     )

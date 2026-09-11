@@ -4,7 +4,7 @@ Inisialisasi Flask app, register semua extension dan blueprint.
 """
 
 import os
-from flask import Flask
+from flask import Flask, render_template
 from .config import Config
 from .extensions import db, migrate, login_manager, csrf
 
@@ -49,5 +49,32 @@ def create_app(config_class=Config):
     @login_manager.user_loader
     def load_user(user_id):
         return models.AdminUser.query.get(int(user_id))
+
+    # Context processor global untuk template Jinja2
+    @app.context_processor
+    def inject_global_data():
+        try:
+            profil = models.ProfilUMKM.query.first()
+        except Exception:
+            profil = None
+
+        raw_wa = profil.no_wa if profil and profil.no_wa else '6282118403965'
+        clean_wa = ''.join(c for c in raw_wa if c.isdigit())
+        if clean_wa.startswith('0'):
+            clean_wa = '62' + clean_wa[1:]
+
+        return {
+            'current_profil': profil,
+            'store_whatsapp': clean_wa
+        }
+
+    # Error handlers halaman ramah pengguna
+    @app.errorhandler(404)
+    def page_not_found(error):
+        return render_template('errors/404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return render_template('errors/500.html'), 500
 
     return app

@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from .extensions import db
+from .constants import OrderStatus
 
 
 class AdminUser(UserMixin, db.Model):
@@ -113,23 +114,11 @@ class Pesanan(db.Model):
 
     @property
     def status_label(self):
-        labels = {
-            'menunggu': 'Menunggu',
-            'diproses': 'Sedang Diproses',
-            'selesai': 'Selesai',
-            'dibatalkan': 'Dibatalkan'
-        }
-        return labels.get(self.status, self.status)
+        return OrderStatus.get_label(self.status)
 
     @property
     def status_color(self):
-        colors = {
-            'menunggu': 'warning',
-            'diproses': 'info',
-            'selesai': 'success',
-            'dibatalkan': 'danger'
-        }
-        return colors.get(self.status, 'secondary')
+        return OrderStatus.get_color(self.status)
 
     def __repr__(self):
         return f'<Pesanan #{self.id} Meja {self.meja_id}>'

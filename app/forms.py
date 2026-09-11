@@ -12,6 +12,7 @@ from wtforms import (
 from wtforms.validators import (
     DataRequired, Length, NumberRange, Optional, ValidationError
 )
+from .constants import MenuCategory, OrderType, AppDefaults
 
 
 class LoginForm(FlaskForm):
@@ -49,13 +50,7 @@ class MenuForm(FlaskForm):
     )
     kategori = SelectField(
         'Kategori',
-        choices=[
-            ('Makanan', 'Makanan'),
-            ('Minuman', 'Minuman'),
-            ('Snack', 'Snack'),
-            ('Dessert', 'Dessert'),
-            ('Paket', 'Paket'),
-        ],
+        choices=MenuCategory.CHOICES,
         validators=[DataRequired()]
     )
     tersedia = BooleanField('Tersedia', default=True)
@@ -144,11 +139,8 @@ class CheckoutForm(FlaskForm):
     )
     tipe_pesanan = SelectField(
         'Tipe Pesanan',
-        choices=[
-            ('Dine-in', 'Makan di Tempat (Dine-in)'),
-            ('Takeaway', 'Bungkus (Take Away)')
-        ],
-        default='Dine-in'
+        choices=OrderType.CHOICES,
+        default=OrderType.DINE_IN
     )
     nomor_meja = StringField(
         'Nomor Meja (jika makan di tempat)',
