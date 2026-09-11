@@ -32,9 +32,17 @@ class StorageService:
         if not file_storage:
             return '', None
 
-        supabase_url = current_app.config.get('SUPABASE_URL', '').rstrip('/')
-        supabase_key = current_app.config.get('SUPABASE_KEY', '').strip()
-        bucket_name = current_app.config.get('SUPABASE_BUCKET', 'dapur_mamita').strip()
+        raw_url = str(current_app.config.get('SUPABASE_URL', '') or '').strip()
+        url_lines = [l.strip().strip("'\"") for l in raw_url.splitlines() if l.strip()]
+        supabase_url = url_lines[0].rstrip('/') if url_lines else ''
+
+        raw_key = str(current_app.config.get('SUPABASE_KEY', '') or '').strip()
+        key_lines = [l.strip().strip("'\"") for l in raw_key.splitlines() if l.strip()]
+        supabase_key = key_lines[0] if key_lines else ''
+
+        raw_bucket = str(current_app.config.get('SUPABASE_BUCKET', '') or '').strip()
+        bucket_lines = [l.strip().strip("'\"") for l in raw_bucket.splitlines() if l.strip()]
+        bucket_name = bucket_lines[0] if bucket_lines else 'dapur_mamita'
 
         err_msg = None
 
