@@ -740,3 +740,523 @@ h1, h2, h3, .section-title {
     margin-bottom: 15px;
     display: block;
 }
+
+/* ==========================================================================
+   MOBILE TOP APP BAR (Android Material Design Style)
+   ========================================================================== */
+.mobile-top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1050;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 10px 16px;
+    box-shadow: 0 1px 8px rgba(93, 64, 55, 0.08);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.mobile-table-pill {
+    background: var(--cream-light);
+    color: var(--dark-brown);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   MOBILE BOTTOM NAVIGATION BAR (Android Material Design 3)
+   ========================================================================== */
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1040;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+    box-shadow: 0 -2px 12px rgba(93, 64, 55, 0.08);
+    border-top: 1px solid var(--border-color);
+}
+
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 16px;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-nav-item i {
+    font-size: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.mobile-nav-item.active {
+    color: var(--accent-orange);
+    font-weight: 700;
+}
+
+.mobile-nav-item.active i {
+    transform: scale(1.1);
+}
+
+.mobile-nav-badge {
+    position: absolute;
+    top: -4px;
+    right: -8px;
+    background: var(--accent-orange);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+/* ==========================================================================
+   MOBILE FLOATING STICKY CART BAR (GoFood / ShopeeFood Style)
+   ========================================================================== */
+.mobile-floating-cart {
+    position: fixed;
+    bottom: 64px;
+    left: 12px;
+    right: 12px;
+    z-index: 1035;
+    animation: slideUpCart 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideUpCart {
+    0% { transform: translateY(100px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.floating-cart-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, var(--primary-brown), var(--dark-brown));
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 16px;
+    text-decoration: none;
+    box-shadow: 0 6px 24px rgba(62, 39, 35, 0.35);
+    transition: transform 0.2s ease;
+}
+
+.floating-cart-inner:hover,
+.floating-cart-inner:active {
+    color: #fff;
+    transform: scale(1.02);
+}
+
+.floating-cart-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.floating-cart-badge {
+    background: var(--accent-orange);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.85rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floating-cart-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.floating-cart-label {
+    font-size: 0.68rem;
+    opacity: 0.8;
+}
+
+.floating-cart-price {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.floating-cart-right {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    opacity: 0.9;
+}
+
+/* ==========================================================================
+   MOBILE SEARCH BOX
+   ========================================================================== */
+.mobile-search-box {
+    position: relative;
+    background: var(--surface-white);
+    border: 1.5px solid var(--border-color);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mobile-search-box:focus-within {
+    border-color: var(--accent-orange);
+    box-shadow: 0 0 0 3px rgba(230, 81, 0, 0.1);
+}
+
+.mobile-search-box i {
+    color: var(--text-muted);
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.mobile-search-box input {
+    border: none;
+    outline: none;
+    background: transparent;
+    flex-grow: 1;
+    padding: 12px 10px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: var(--text-dark);
+}
+
+.mobile-search-box input::placeholder {
+    color: #B0A8A3;
+}
+
+/* ==========================================================================
+   MOBILE CATEGORY FILTER (Horizontal scrollable)
+   ========================================================================== */
+.category-filter-mobile {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.category-filter-mobile::-webkit-scrollbar {
+    display: none;
+}
+
+/* ==========================================================================
+   MOBILE CATEGORY GRID (Homepage Quick Access - Android Shortcut Style)
+   ========================================================================== */
+.mobile-cat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.mobile-cat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    padding: 8px 4px;
+    border-radius: 14px;
+    transition: background 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-cat-item:active {
+    background: var(--cream-light);
+}
+
+.mobile-cat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    transition: transform 0.15s ease;
+}
+
+.mobile-cat-item:active .mobile-cat-icon {
+    transform: scale(0.92);
+}
+
+.mobile-cat-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    text-align: center;
+}
+
+/* ==========================================================================
+   RESPONSIVE MEDIA QUERIES - MOBILE (< 992px / lg breakpoint)
+   ========================================================================== */
+
+/* -- Body spacing for fixed bottom nav on mobile -- */
+@media (max-width: 991.98px) {
+    body {
+        padding-bottom: 70px;
+    }
+
+    main {
+        min-height: calc(100vh - 200px);
+    }
+
+    /* Footer hides on mobile for cleaner app feel */
+    .site-footer {
+        margin-top: 30px;
+        padding: 30px 0 80px;
+    }
+
+    /* Hero on mobile: shorter, text centered */
+    .hero-section {
+        min-height: auto !important;
+    }
+
+    .hero-content {
+        text-align: center;
+        padding: 20px 0 10px;
+    }
+
+    .hero-title {
+        font-size: 1.8rem !important;
+        line-height: 1.2;
+    }
+
+    .hero-subtitle {
+        font-size: 0.88rem !important;
+        line-height: 1.5;
+    }
+
+    .min-vh-75 {
+        min-height: auto !important;
+    }
+
+    /* Menu Cards: Horizontal layout on mobile (like Grab/GoFood) */
+    .menu-card {
+        flex-direction: row;
+        border-radius: 14px;
+        overflow: visible;
+        height: auto;
+        gap: 0;
+    }
+
+    .menu-card:hover {
+        transform: none;
+    }
+
+    .menu-card-body {
+        padding: 12px 14px;
+        order: 1;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .menu-card-img-wrapper {
+        order: 2;
+        flex-shrink: 0;
+        padding: 10px 10px 10px 0;
+    }
+
+    .menu-card-img {
+        width: 100px;
+        height: 100px;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .menu-name {
+        font-size: 0.92rem;
+        margin-bottom: 3px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .menu-desc {
+        font-size: 0.72rem;
+        line-height: 1.35;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 4px;
+        color: var(--text-muted);
+    }
+
+    .menu-price {
+        font-size: 0.88rem;
+    }
+
+    .menu-placeholder {
+        font-size: 2.2rem;
+    }
+
+    .menu-category-badge {
+        display: none;
+    }
+
+    /* Step cards on mobile */
+    .step-card {
+        padding: 16px 10px;
+        border-radius: 14px;
+    }
+
+    .step-icon {
+        font-size: 1.6rem;
+        margin-bottom: 8px;
+    }
+
+    .step-number {
+        width: 22px;
+        height: 22px;
+        font-size: 0.72rem;
+        top: -8px;
+        left: 12px;
+    }
+
+    /* Cart items on mobile */
+    .cart-item {
+        padding: 12px;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .cart-item-img {
+        width: 54px;
+        height: 54px;
+        border-radius: 10px;
+    }
+
+    .cart-item-actions {
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 4px;
+    }
+
+    .checkout-box {
+        border-radius: 14px;
+        padding: 16px;
+    }
+
+    /* Section titles smaller on mobile */
+    .section-title {
+        font-size: 1.35rem;
+    }
+
+    /* CTA Box */
+    .cta-box {
+        padding: 24px 20px;
+        border-radius: 16px;
+    }
+
+    /* Info section */
+    .info-list {
+        gap: 10px;
+    }
+
+    .info-item {
+        font-size: 0.88rem;
+    }
+
+    /* Filter chips */
+    .filter-chip {
+        padding: 6px 14px;
+        font-size: 0.82rem;
+        border-radius: 24px;
+    }
+
+    /* About card */
+    .about-card {
+        padding: 20px;
+        border-radius: 16px;
+    }
+
+    .contact-item i {
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+        border-radius: 10px;
+    }
+
+    /* Empty state */
+    .empty-state {
+        padding: 40px 16px;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+    }
+}
+
+/* -- Extra small screens (< 576px) -- */
+@media (max-width: 575.98px) {
+    .hero-title {
+        font-size: 1.5rem !important;
+    }
+
+    .hero-subtitle {
+        font-size: 0.82rem !important;
+    }
+
+    .container {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .menu-card-img {
+        width: 90px;
+        height: 90px;
+    }
+
+    .menu-card-body {
+        padding: 10px 12px;
+    }
+
+    .menu-name {
+        font-size: 0.85rem;
+    }
+
+    .menu-price {
+        font-size: 0.82rem;
+    }
+
+    .btn-lg {
+        font-size: 0.92rem;
+        padding: 10px 20px;
+    }
+}
+
