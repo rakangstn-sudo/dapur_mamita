@@ -55,10 +55,14 @@ class MenuForm(FlaskForm):
     )
     tersedia = BooleanField('Tersedia', default=True)
     foto = FileField(
-        'Foto Menu',
+        'Upload File Foto (JPG/PNG)',
         validators=[
             FileAllowed(['jpg', 'jpeg', 'png'], 'Hanya file JPG/PNG yang diizinkan.'),
         ]
+    )
+    foto_url_input = StringField(
+        'Atau Masukkan Link / URL Foto',
+        validators=[Optional(), Length(max=500)]
     )
     submit = SubmitField('Simpan')
 
@@ -111,10 +115,14 @@ class ProfilForm(FlaskForm):
         validators=[Optional(), Length(max=200)]
     )
     foto = FileField(
-        'Foto/Logo UMKM',
+        'Upload Foto/Logo UMKM',
         validators=[
             FileAllowed(['jpg', 'jpeg', 'png'], 'Hanya file JPG/PNG yang diizinkan.'),
         ]
+    )
+    foto_url_input = StringField(
+        'Atau Masukkan Link / URL Foto',
+        validators=[Optional(), Length(max=500)]
     )
     submit = SubmitField('Simpan Profil')
 

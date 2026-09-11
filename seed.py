@@ -98,7 +98,7 @@ def seed_database():
                 "harga": 5000,
                 "kategori": "Snack",
                 "tersedia": True,
-                "foto_url": ""
+                "foto_url": "/static/images/menu/kebab.jpg"
             },
             {
                 "nama": "Kebab Jumbo",
@@ -106,7 +106,7 @@ def seed_database():
                 "harga": 10000,
                 "kategori": "Snack",
                 "tersedia": True,
-                "foto_url": ""
+                "foto_url": "/static/images/menu/kebab.jpg"
             },
             {
                 "nama": "Roti Goreng Selai",

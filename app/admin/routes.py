@@ -77,9 +77,12 @@ def menu_tambah() -> Union[Response, str]:
 
     if form.validate_on_submit():
         foto_url = ''
+        upload_err = None
         if form.foto.data:
             filename = StorageService.generate_filename(form.foto.data.filename, prefix='menu')
-            foto_url = StorageService.upload_file(form.foto.data, filename)
+            foto_url, upload_err = StorageService.upload_file_with_status(form.foto.data, filename)
+        elif form.foto_url_input.data and form.foto_url_input.data.strip():
+            foto_url = form.foto_url_input.data.strip()
 
         menu = MenuItem(
             nama=form.nama.data,
@@ -93,6 +96,9 @@ def menu_tambah() -> Union[Response, str]:
         db.session.commit()
 
         flash(f'Menu "{menu.nama}" berhasil ditambahkan!', 'success')
+        if upload_err:
+            flash(f'Peringatan upload foto: {upload_err}', 'warning')
+
         return redirect(url_for('admin.menu_list'))
 
     menu_items = MenuItem.query.order_by(MenuItem.kategori, MenuItem.nama).all()
@@ -113,14 +119,20 @@ def menu_edit(menu_id: int) -> Union[Response, str]:
         menu.kategori = form.kategori.data
         menu.tersedia = form.tersedia.data
 
+        upload_err = None
         if form.foto.data:
             filename = StorageService.generate_filename(form.foto.data.filename, prefix='menu')
-            foto_url = StorageService.upload_file(form.foto.data, filename)
-            if foto_url:
-                menu.foto_url = foto_url
+            uploaded_url, upload_err = StorageService.upload_file_with_status(form.foto.data, filename)
+            if uploaded_url:
+                menu.foto_url = uploaded_url
+        elif form.foto_url_input.data and form.foto_url_input.data.strip():
+            menu.foto_url = form.foto_url_input.data.strip()
 
         db.session.commit()
         flash(f'Menu "{menu.nama}" berhasil diupdate!', 'success')
+        if upload_err:
+            flash(f'Peringatan upload foto: {upload_err}', 'warning')
+
         return redirect(url_for('admin.menu_list'))
 
     menu_items = MenuItem.query.order_by(MenuItem.kategori, MenuItem.nama).all()
@@ -348,14 +360,20 @@ def profil() -> Union[Response, str]:
         profil_data.no_wa = form.no_wa.data or ''
         profil_data.jam_operasional = form.jam_operasional.data or ''
 
+        upload_err = None
         if form.foto.data:
             filename = StorageService.generate_filename(form.foto.data.filename, prefix='profil')
-            foto_url = StorageService.upload_file(form.foto.data, filename)
-            if foto_url:
-                profil_data.foto_url = foto_url
+            uploaded_url, upload_err = StorageService.upload_file_with_status(form.foto.data, filename)
+            if uploaded_url:
+                profil_data.foto_url = uploaded_url
+        elif form.foto_url_input.data and form.foto_url_input.data.strip():
+            profil_data.foto_url = form.foto_url_input.data.strip()
 
         db.session.commit()
         flash('Profil UMKM berhasil diupdate!', 'success')
+        if upload_err:
+            flash(f'Peringatan upload foto: {upload_err}', 'warning')
+
         return redirect(url_for('admin.profil'))
 
     return render_template('admin/profil_form.html', form=form, profil=profil_data)

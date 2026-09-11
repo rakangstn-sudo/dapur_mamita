@@ -89,6 +89,14 @@
                                 {% endif %}
                             </div>
 
+                            <div class="mb-3">
+                                <label for="foto_url_input" class="form-label fw-semibold">
+                                    <i class="bi bi-link-45deg me-1"></i>Atau Masukkan URL / Link Foto Langsung
+                                </label>
+                                {{ form.foto_url_input(class="form-control", placeholder="https://contoh.com/kebab.jpg") }}
+                                <small class="text-muted">Bisa tempel link gambar langsung dari internet atau Supabase public link.</small>
+                            </div>
+
                             <div class="mb-4 form-check form-switch">
                                 {{ form.tersedia(class="form-check-input", role="switch") }}
                                 <label class="form-check-label fw-semibold" for="tersedia">Status Tersedia</label>

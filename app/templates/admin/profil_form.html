@@ -96,6 +96,14 @@
                                 {% endif %}
                             </div>
 
+                            <div class="mb-4">
+                                <label for="foto_url_input" class="form-label fw-semibold">
+                                    <i class="bi bi-link-45deg me-1"></i>Atau Masukkan URL / Link Foto Langsung
+                                </label>
+                                {{ form.foto_url_input(class="form-control", placeholder="https://contoh.com/logo.jpg") }}
+                                <small class="text-muted">Alternatif jika tidak ingin upload file.</small>
+                            </div>
+
                             <div class="d-flex justify-content-end gap-2">
                                 <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary px-4">Batal</a>
                                 {{ form.submit(class="btn btn-warm btn-lg px-5") }}
