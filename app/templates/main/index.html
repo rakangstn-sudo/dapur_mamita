@@ -136,7 +136,7 @@
                     <div class="menu-card-img-wrapper">
                         <div class="menu-card-img">
                             {% if menu.foto_url %}
-                                <img src="{{ menu.foto_url }}" alt="{{ menu.nama }}" loading="lazy">
+                                <img src="{{ menu.foto_url }}" alt="{{ menu.nama }}" loading="lazy" decoding="async">
                             {% else %}
                                 <div class="menu-placeholder">
                                     {% if menu.kategori == 'Minuman' %}

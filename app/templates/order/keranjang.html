@@ -25,7 +25,7 @@
                     <div class="cart-item">
                         <div class="cart-item-img">
                             {% if item.foto_url %}
-                                <img src="{{ item.foto_url }}" alt="{{ item.nama }}">
+                                <img src="{{ item.foto_url }}" alt="{{ item.nama }}" loading="lazy" decoding="async">
                             {% else %}
                                 <div class="cart-img-placeholder">
                                     <i class="bi bi-egg-fried"></i>

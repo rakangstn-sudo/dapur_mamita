@@ -28,6 +28,16 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Optimasi layar sentuh (menghapus 300ms tap delay pada HP) */
+button, a, .btn, .filter-chip, .mobile-nav-item, input, select, textarea {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 main {
@@ -303,10 +313,12 @@ h1, h2, h3, .section-title {
     border-radius: 18px;
     overflow: hidden;
     box-shadow: var(--card-shadow);
-    transition: all 0.3s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     display: flex;
     flex-direction: column;
     height: 100%;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 130px;
 }
 
 .menu-card:hover {
