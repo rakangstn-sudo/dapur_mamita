@@ -1,10 +1,13 @@
 """
-Storage Service — Pengelolaan upload aset/gambar ke Supabase Storage
-dengan fallback penyimpanan lokal cerdas untuk server lokal/laptop.
+Storage Service — Pengelolaan upload aset/gambar langsung ke Supabase Storage REST API
+Mendukung semua format API Key Supabase (JWT anon/service_role maupun Secret sb_secret_...)
+dengan fallback penyimpanan lokal.
 """
 
 import os
 import uuid
+import urllib.request
+import urllib.error
 from typing import Tuple, Optional
 from flask import current_app
 
@@ -22,57 +25,59 @@ class StorageService:
     @classmethod
     def upload_file_with_status(cls, file_storage, filename: str) -> Tuple[str, Optional[str]]:
         """
-        Upload FileStorage ke Supabase Storage, atau fallback ke folder lokal app/static/uploads/.
+        Upload FileStorage langsung ke Supabase Storage REST API.
         Returns:
             Tuple[str, Optional[str]]: (public_url, error_message)
         """
         if not file_storage:
             return '', None
 
-        # Cek apakah Supabase dikonfigurasi
-        supabase_url = current_app.config.get('SUPABASE_URL', '').strip()
+        supabase_url = current_app.config.get('SUPABASE_URL', '').rstrip('/')
         supabase_key = current_app.config.get('SUPABASE_KEY', '').strip()
         bucket_name = current_app.config.get('SUPABASE_BUCKET', 'dapur_mamita').strip()
 
-        # Cek apakah format key Supabase valid (harus berupa JWT token diawali 'eyJ')
-        is_jwt_key = supabase_key.startswith('eyJ')
-        supabase_configured = bool(supabase_url and supabase_key)
+        err_msg = None
 
-        # 1. Coba upload ke Supabase jika key valid
-        if supabase_configured and is_jwt_key:
+        # 1. Upload langsung via Supabase REST API (menggunakan urllib bawaan Python)
+        if supabase_url and supabase_key:
             try:
-                from supabase import create_client
-                client = create_client(supabase_url, supabase_key)
+                upload_endpoint = f"{supabase_url}/storage/v1/object/{bucket_name}/uploads/{filename}"
+                content_type = getattr(file_storage, 'content_type', 'image/jpeg') or 'image/jpeg'
 
                 file_storage.seek(0)
                 file_bytes = file_storage.read()
-                content_type = getattr(file_storage, 'content_type', 'image/jpeg') or 'image/jpeg'
-                file_path = f"uploads/{filename}"
 
-                client.storage.from_(bucket_name).upload(
-                    path=file_path,
-                    file=file_bytes,
-                    file_options={"content-type": content_type}
+                headers = {
+                    "apikey": supabase_key,
+                    "Authorization": f"Bearer {supabase_key}",
+                    "Content-Type": content_type,
+                    "x-upsert": "true"
+                }
+
+                req = urllib.request.Request(
+                    upload_endpoint,
+                    data=file_bytes,
+                    headers=headers,
+                    method="POST"
                 )
 
-                public_url = client.storage.from_(bucket_name).get_public_url(file_path)
-                if public_url:
-                    return public_url, None
+                with urllib.request.urlopen(req, timeout=20) as response:
+                    if response.status in (200, 201):
+                        public_url = f"{supabase_url}/storage/v1/object/public/{bucket_name}/uploads/{filename}"
+                        current_app.logger.info(f"Berhasil upload ke Supabase: {public_url}")
+                        return public_url, None
 
+            except urllib.error.HTTPError as http_err:
+                body = http_err.read().decode('utf-8', errors='ignore')
+                err_msg = f"Supabase HTTP {http_err.code}: {body}"
+                current_app.logger.error(f"Gagal upload Supabase REST: {err_msg}")
             except Exception as err:
-                current_app.logger.error(f'Gagal upload ke Supabase: {err}')
-                supabase_err = str(err)
-        elif supabase_configured and not is_jwt_key:
-            supabase_err = (
-                "SUPABASE_KEY yang dimasukkan berawalan 'sb_secret_...', "
-                "bukan Project API Key (JWT) dari Supabase. "
-                "Silakan gunakan API Key 'anon' atau 'service_role' dari Dashboard Supabase -> Project Settings -> API."
-            )
-            current_app.logger.warning(supabase_err)
+                err_msg = f"Gagal upload Supabase: {err}"
+                current_app.logger.error(f"Exception upload Supabase: {err_msg}")
         else:
-            supabase_err = "Supabase Storage belum dikonfigurasi."
+            err_msg = "SUPABASE_URL atau SUPABASE_KEY belum diisi."
 
-        # 2. Fallback: Simpan ke folder lokal app/static/uploads jika filesystem writable (seperti di laptop/localhost)
+        # 2. Fallback: Simpan ke folder lokal app/static/uploads jika berjalan di laptop/localhost
         try:
             static_folder = current_app.static_folder or os.path.join(current_app.root_path, 'static')
             uploads_dir = os.path.join(static_folder, 'uploads')
@@ -86,9 +91,8 @@ class StorageService:
             return local_url, None
 
         except (OSError, IOError) as fs_err:
-            # Di Vercel serverless, filesystem selain /tmp bersifat read-only
-            current_app.logger.error(f'Gagal simpan ke penyimpanan lokal: {fs_err}')
-            return '', f"Gagal upload: {supabase_err}"
+            current_app.logger.error(f"Gagal simpan ke penyimpanan lokal: {fs_err}")
+            return '', err_msg or str(fs_err)
 
     @classmethod
     def upload_file(cls, file_storage, filename: str) -> str:
